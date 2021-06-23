@@ -5,22 +5,17 @@ exports = module.exports = server => {
   /* WS SERVER */
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost",
+      origin: "http://localhost:3000",
     },
   });
 
   /* MIDDLEWARE */
-  io.use((socket, next) => {
-    const username = socket.handshake.auth.username;
-    if (!username) {
-      return next(new Error("invalid username"));
-    }
-    socket.username = username;
-    next();
-  });
 
   /* HANDLERS */
-  io.on("connection", (socket) => {
-      //incl other files here eg. require("./file")(socket, io);
-  })
+  io.on("connection", socket => {
+    //incl other files here eg. require("./file")(socket, io);
+    setTimeout(() => {
+      socket.emit("hello", "hello world");
+    }, 3000);
+  });
 };
