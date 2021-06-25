@@ -8,7 +8,7 @@ exports = module.exports = server => {
   /* WS SERVER */
   const io = new Server(server, {
     cors: {
-      origin: ["http://localhost:3000", "http://192.168.8.161:3000"]
+      origin: ["http://localhost:3000", "http://192.168.8.161:3000", `${process.env.FRONTEND_HOST}`]
     },
   });
 
