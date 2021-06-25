@@ -1,29 +1,31 @@
 import { useEffect } from "react";
 import styled from "styled-components";
 
-export default function JoinRoom({ setRoomInfo, joinRoom, errMessage }) {
-  useEffect(() => {
+export default function JoinRoom({
+  roomInfo,
+  setRoomInfo,
+  joinRoom,
+  errMessage,
+}) {
+
+  /* ON COMPONENT MOUNT */
+  const updateDName = () => {
     const dNameEl = document.getElementById("dname");
+    setRoomInfo(prevState => ({
+      ...prevState,
+      dName: dNameEl.value.replace(" ", "").substring(0, 18), //save new value into state & remove spaces + characters beyond limit
+    }));
+  }; //Updates state to reflect display name input
+
+  const updateRCode = () => {
     const rCodeEl = document.getElementById("rcode");
+    setRoomInfo(prevState => ({
+      ...prevState,
+      rCode: rCodeEl.value.replace(" ", "").substring(0, 6),
+    }));
+  }; //Updates state to reflect room code input
 
-    const updateDName = function (e) {
-      setRoomInfo(prevState => ({
-        ...prevState,
-        dName: e.target.value,
-      }));
-    };
-
-    const updateRCode = function (e) {
-      setRoomInfo(prevState => ({
-        ...prevState,
-        rCode: e.target.value,
-      }));
-    };
-
-    dNameEl.addEventListener("input", updateDName);
-    rCodeEl.addEventListener("input", updateRCode);
-  }, []);
-
+  /* COMPONENT */
   return (
     <JoinRoomWrapper>
       <Title>Hecklevision</Title>
@@ -35,6 +37,8 @@ export default function JoinRoom({ setRoomInfo, joinRoom, errMessage }) {
           maxLength={18}
           minLength={4}
           placeholder={"Display Name"}
+          value={roomInfo.dName}
+          onInput={updateDName}
         />
         <InputBox
           id="rcode"
@@ -43,9 +47,15 @@ export default function JoinRoom({ setRoomInfo, joinRoom, errMessage }) {
           maxLength={6}
           minLength={6}
           placeholder={"Room Code"}
+          value={roomInfo.rCode}
+          onInput={updateRCode}
         />
       </InputBoxWrapper>
-      <JoinButton onClick={() => { joinRoom() }}>
+      <JoinButton
+        onClick={() => {
+          joinRoom();
+        }}
+      >
         <JoinButtonText>Join Room</JoinButtonText>
       </JoinButton>
       <ErrMessage>{errMessage}</ErrMessage>
@@ -55,7 +65,7 @@ export default function JoinRoom({ setRoomInfo, joinRoom, errMessage }) {
 
 /* STYLES */
 const JoinRoomWrapper = styled.div`
-  margin: 1rem auto;
+  margin: 1rem;
 
   display: flex;
   flex-direction: column;

@@ -1,10 +1,10 @@
-import Head from "next/head";
 import styled from "styled-components";
-import io from "socket.io-client";
 import { useEffect, useState } from "react";
+import socket from "../util/socket";
 
 /* COMPONENT IMPORTS */
 import JoinRoom from "../components/forms/join-room";
+import ChatWindow from "../components/chat-window";
 
 /* FUNCTION COMPONENT */
 export default function Home() {
@@ -17,9 +17,30 @@ export default function Home() {
 
   const [errMessage, setErrMessage] = useState("");
 
-  const socket = io("http://localhost", {
-    autoConnect: false,
-  });
+  useEffect(() => {
+    socket.on("connect_error", () => {
+      setErrMessage("Error connecting to server!");
+    });
+
+    socket.on("join-status", status => {
+      //wait for socket to connect & auth
+      if (status === "join_success") {
+        setRoomInfo(prevState => ({
+          ...prevState,
+          connected: socket.connected,
+        })); //set state to relfect connection state
+      } else if (status === "invalid_code_error")
+        setErrMessage("Invalid Room Code!");
+      else if (status === "name_taken_error")
+        setErrMessage("Name already taken!");
+      else setErrMessage("An unexpected error has occurred");
+    });
+
+    return () => {
+      socket.off("join-status");
+      socket.off("connect_error");
+    };
+  }, []);
 
   if (!roomInfo.connected)
     //Show login form when not already connected to a room / socket server
@@ -38,9 +59,9 @@ export default function Home() {
 
   return (
     //Primary page; client is connected to a room on the server.
-    <>
-      Connected as {roomInfo.dName} to room {roomInfo.rCode}.
-    </>
+    <Page>
+      <ChatWindow roomInfo={roomInfo} />
+    </Page>
   );
 
   /* LOGIC */
@@ -54,23 +75,14 @@ export default function Home() {
         setErrMessage("Invalid Room Code length!");
       else {
         //Inputs are valid, connect to WS server
-        connectToWS();
+        socket.emit("request-join", {
+          dName: roomInfo.dName,
+          rCode: roomInfo.rCode,
+        });
       }
     } else if (!roomInfo.dName) setErrMessage("Missing display name!");
     else if (!roomInfo.rCode) setErrMessage("Missing Room Code!");
     else setErrMessage("An unexpected error ocurred");
-  }
-
-  function connectToWS() {
-    socket.connect(); //connect to ws server
-    socket.on("connect", () => {
-      //wait for socket to connect
-      setRoomInfo(prevState => ({
-        //set state to relfect connection state
-        ...prevState,
-        connected: socket.connected,
-      }));
-    });
   }
 }
 

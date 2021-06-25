@@ -1,0 +1,5 @@
+node_modules
+.next
+.eslintrc
+.gitignore
+README.md
