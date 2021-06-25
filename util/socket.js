@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
 
-const socket = new io("http://192.168.8.161");
+const socket = new io(`${process.env.BACKEND_HOST}`);
 
 export default socket;
