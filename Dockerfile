@@ -4,7 +4,6 @@ FROM node:latest
 
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV BACKEND_HOST=https://ws1.hv.do1.uthd.dev
 
 EXPOSE 3000
 

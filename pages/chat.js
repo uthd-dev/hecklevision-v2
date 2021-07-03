@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import socket from "../util/socket";
+import { useCookies } from "react-cookie"
 
 /* COMPONENT IMPORTS */
 import JoinRoom from "../components/forms/join-room";
@@ -16,6 +17,7 @@ export default function Home() {
   });
 
   const [errMessage, setErrMessage] = useState("");
+  const [cookie, setCookie] = useCookies(["user"])
 
   useEffect(() => {
     socket.on("connect_error", () => {
